@@ -44,7 +44,6 @@ BigInt::BigInt()
 	_numDigits++;
 	sign = 1;
 	bigIntCounter++;
-	
 }
 
 BigInt::~BigInt()
@@ -60,7 +59,7 @@ BigInt::~BigInt()
 // BUG
 //////////////////////////////////////////////////////////////////////////////
 
-BigInt::BigInt(const char* const s,  int size)
+BigInt::BigInt(const char* const s, int size)
 {
 	bigIntCounter++;
 	_digits = nullptr; // Array: 儲存整數
@@ -100,11 +99,12 @@ BigInt::BigInt(const int valueR, const int size)
 {
 	bigIntCounter++;
 	int value = valueR;
-	if(value<0)
+	if (value < 0)
 	{
 		sign = -1;
 		value = value * -1;
-	}else
+	}
+	else
 	{
 		sign = 1;
 	}
@@ -172,7 +172,7 @@ void BigInt::Add(const char* const addchar)
 
 void BigInt::Add(const BigInt& bi)
 {
-	int isSubtracttion=0;
+	int isSubtracttion = 0;
 	int biSize;
 	if (bi._numDigits + 1 >= _capacity)
 	{
@@ -187,7 +187,6 @@ void BigInt::Add(const BigInt& bi)
 	}
 
 
-
 	if (bi._numDigits > _numDigits)
 	{
 		_numDigits = bi._numDigits;
@@ -200,11 +199,11 @@ void BigInt::Add(const BigInt& bi)
 
 
 	int i;
-	if(sign==-1&& bi.sign ==1)
+	if (sign == -1 && bi.sign == 1)
 	{
 		for (i = 0; i < biSize; i++)
 		{
-			if (i <_numDigits)
+			if (i < _numDigits)
 			{
 				_digits[i] = 9 - _digits[i];
 			}
@@ -214,23 +213,19 @@ void BigInt::Add(const BigInt& bi)
 			}
 		}
 		sign = 1;
-		
+
 		Add(1);
 		isSubtracttion = 1;
 	}
 
 
-	
-
 	BigInt adder;
 	adder._digits = new char[biSize];
-	
-	
 
-	if (sign==1 && bi.sign == -1)
+
+	if (sign == 1 && bi.sign == -1)
 	{
-		
-		for(i=0;i<biSize;i++)
+		for (i = 0; i < biSize; i++)
 		{
 			if (i < bi._numDigits)
 			{
@@ -241,30 +236,31 @@ void BigInt::Add(const BigInt& bi)
 				adder._digits[i] = 9;
 			}
 		}
-		
+
 		adder.Add(1);
 		isSubtracttion = 1;
 		adder._numDigits = biSize;
-	}else
+	}
+	else
 	{
 		delete[] adder._digits;
-		
+
 		adder.sign = bi.sign;
 		adder._capacity = bi._capacity;
 		adder._digits = new char[adder._capacity];
 		adder.Zero();
 		adder._numDigits = bi._numDigits;
-		for(i=0;i<bi._numDigits;i++)
+		for (i = 0; i < bi._numDigits; i++)
 		{
 			adder._digits[i] = bi._digits[i];
 		}
 	}
-	
+
 	/*cout << "add:";
 	(*this).PrintValue();
 	cout<<"+";
 	adder.PrintValue();*/
-	
+
 
 	int carry = 0;
 	i = 0;
@@ -293,14 +289,14 @@ void BigInt::Add(const BigInt& bi)
 		i++;
 	}
 
-	
-	if(isSubtracttion==1)
+
+	if (isSubtracttion == 1)
 	{
-		
-		if(carry==1)
+		if (carry == 1)
 		{
 			sign = 1;
-		}else
+		}
+		else
 		{
 			for (i = 0; i < biSize; i++)
 			{
@@ -309,8 +305,8 @@ void BigInt::Add(const BigInt& bi)
 			Add(1);
 			sign = -1;
 		}
-		
-	}else
+	}
+	else
 	{
 		if (carry == 1)
 		{
@@ -328,10 +324,42 @@ void BigInt::Add(const BigInt& bi)
 			_digits[i] = _digits[i] + 1;
 		}
 	}
-
-	
-	
 }
+
+int BigInt::division(BigInt b, BigInt& remainder)
+{
+	
+	b.sign = this->sign * -1;
+	BigInt temp(*this);
+
+	int counter = 0;
+	while (temp.sign == this->sign)
+	{
+		temp.Add(b);
+		counter++;
+	}
+
+	b.sign = b.sign * -1;
+	temp.Add(b);
+	remainder = temp;
+	counter--;
+	return counter;
+}
+
+
+int BigInt::isZero()
+{
+	int i = 0;
+	for (i = 0; i < _numDigits; i++)
+	{
+		if (_digits[i] != 0)
+		{
+			return 0;
+		}
+	}
+	return 1;
+}
+
 
 int BigInt::bigIntCounter = 0;
 
@@ -340,12 +368,64 @@ int BigInt::bigIntCounter = 0;
 
 void main()
 {
-	
 	BigInt x, y("1234"), z("00000987654321");
-	x = 30;
-	y = "6636666666"/x;
-	cout << y;
 
+
+
+	
+	cout << "x y z values: " << x << ' ' << y << ' ' << z << endl;
+	BigInt i(44, 2); // Array 大小 2		 
+	BigInt j(i);
+	BigInt k(10);
+	cout << "i j k values: " << i << ' ' << j << ' ' << k << endl;
+	cout << "Total BigInt Object Count: " << BigInt::getCount() << endl;
+
+	x = y = "987654321098765432109876543210987654321098765432109876543210";
+	cout << "x y z values: " << x << ' ' << y << ' ' << z << endl;
+
+	y = 10;
+	y *= -88;
+	cout << "y values: " << y << endl;
+	y = 10;
+	y *= i;
+	cout << "y values: " << y << endl;
+
+	//x = 666666668;
+	y = x / 8;
+	cout << "y values: " << y << endl;
+	x /= -8;
+	cout << "x values: " << x << endl;
+	x /= i;
+	cout << "x values: " << x << endl;
+
+	y = 10;
+	y += -88;
+	cout << "y values: " << y << endl;
+	y = 10;
+	y += i;
+	cout << "y values: " << y << endl;
+	y = 10;
+	y -= -88;
+	cout << "y values: " << y << endl;
+	y = 10;
+	y -= i;
+	cout << "y values: " << y << endl;
+
+	x = i + 3 + j * 2 * k;
+	cout << "x values: " << x << endl;
+	x = i - 3 - j * 2 * k;
+	cout << "x values: " << x << endl;
+	cout << "k values: " << k++ << ' ' << k << endl;
+
+	k = 10;
+	x = ++k++;
+	cout << "x k values: " << x << ' ' << k << endl;
+	k = 10;
+	x = --k--;
+	cout << "x k values: " << x << ' ' << k << endl;
+
+	x = y = "987654321098765432109876543210";
+	cout << "x y z values: " << x << ' ' << y << ' ' << z << endl;
 
 
 	system("pause");

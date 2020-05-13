@@ -1,5 +1,6 @@
 #ifndef BIGINT_H
 #define BIGINT_H
+#include <string>
 using namespace std;
 
 //大整數
@@ -25,13 +26,19 @@ public:
 	void Add(const BigInt&);
 	void Add(int);
 	void Add(const char*);
+	int isZero();
+	int division(BigInt, BigInt&);
 	void PrintValue();
 	friend ostream& operator<<(ostream& out, BigInt a);
 	friend BigInt operator+=(BigInt& a, BigInt b);
 	BigInt operator=(BigInt b);
 	friend BigInt operator-(BigInt a, BigInt b);
 	friend BigInt operator*(BigInt a, BigInt times);
-	friend BigInt operator/(BigInt a, BigInt b);
+	BigInt operator/(BigInt b);
+	BigInt& operator++();
+	BigInt operator++(int b);
+	BigInt& operator--();
+	BigInt operator--(int b);
 private:
 	char* _digits; // Array: array每一個整數存一位數 存整數可以倒過來存計算比較方便(array第一個存個位數 array第二個存十位數 ...)
 	int _capacity; // Array  記憶體容量 
@@ -39,7 +46,6 @@ private:
 	int sign;
 	// 擴充成允許正負數使用
 };
-
 
 
 ostream& operator<<(ostream& out, BigInt a)
@@ -76,16 +82,16 @@ BigInt operator-=(BigInt& a, BigInt b)
 }
 
 
-BigInt operator++(BigInt& a)
+BigInt& BigInt::operator++()
 {
-	a.Add(1);
-	return a;
+	Add(1);
+	return *this;
 }
 
-BigInt operator++(BigInt& a, int b)
+BigInt BigInt::operator++(int b)
 {
-	BigInt temp(a);
-	a.Add(1);
+	BigInt temp(*this);
+	Add(1);
 	return temp;
 }
 
@@ -102,30 +108,27 @@ BigInt operator-(BigInt a, BigInt b)
 	return a;
 }
 
-BigInt operator--(BigInt& a, int b)
+BigInt BigInt::operator--(int b)
 {
-	BigInt temp(a);
-	a.Add(-1);
+	BigInt temp(*this);
+	Add(-1);
 	return temp;
 }
 
-BigInt& operator--(BigInt& a)
+BigInt& BigInt::operator--()
 {
-	a.Add(-1);
-	return a;
+	Add(-1);
+	return *this;
 }
-
-
-
 
 
 BigInt operator*(BigInt a, BigInt times)
 {
 	BigInt temp(a);
-	/*if(times._numDigits==1||times._digits[0]==0)
+	if(times._numDigits==1||times._digits[0]==0)
 	{
         return 0;
-	}*/
+	}
 	int isNegative = 0;
 	if (times.sign == -1)
 	{
@@ -156,30 +159,78 @@ BigInt operator*=(BigInt& a, BigInt times)
 	return a;
 }
 
-BigInt operator/(BigInt a, BigInt b)
+BigInt BigInt::operator/(BigInt b)
 {
-	int isNegative = 0;
-	if (a.sign != b.sign)
-	{
-		isNegative = 1;
-	}
-	b.sign = a.sign * -1;
-	BigInt temp(a);
+	/*效率不夠
+	 */
+	int finalSign = sign * b.sign;
+	
+	BigInt temp(*this);
+	temp.sign = 1;
+	b.sign = 1;
+	int currentIndex = _numDigits - b._numDigits;
+	int currentUpperCap = _numDigits - 1;
 
-	int counter=0;
-	while (temp.sign == a.sign)
+	
+	string answer = "";
+	
+	BigInt currentRemainder;
+
+	
+	while (true)
 	{
-		temp.Add(b);
-		counter++;
+		
+		if(currentIndex==-1)
+		{
+			break;
+		}
+		
+		string theNum = "";
+		int i;
+		for (i = currentUpperCap; i >= currentIndex; i--)
+		{
+			theNum += to_string(temp._digits[i]);
+		}
+		const char* buffer = theNum.c_str();
+
+	
+		BigInt theNumThisRound(buffer);
+		//cout <<"temp:"<<temp<< "\ttheNum: " << theNumThisRound << "\t";
+
+		
+		int resultThisRound = theNumThisRound.division(b, currentRemainder);
+
+		//cout << "result this round:" << resultThisRound  <<"\tcurrentRemainder: "<<currentRemainder << endl;
+
+		while (currentRemainder._digits[currentRemainder._numDigits - 1] == 0)
+		{
+			currentRemainder._numDigits = currentRemainder._numDigits - 1;
+		}
+
+		if (resultThisRound == 0)
+		{
+			answer += to_string(0);
+			currentIndex--;
+		}
+		else
+		{
+			answer += to_string(resultThisRound);
+			int j = 0;
+			while(j<currentRemainder._numDigits)
+			{
+				temp._digits[currentIndex+j]=currentRemainder._digits[j];
+				j++;
+			}
+			temp._numDigits = currentIndex + j;
+			currentUpperCap = temp._numDigits - 1;
+			currentIndex --;
+		}
 	}
-	counter--;
-	if (isNegative == 0)
-	{
-		b.sign = b.sign * -1;
-	}
-	BigInt result(counter);
-	result.sign = a.sign * b.sign;
-	return result;
+	const char* buffer = answer.c_str();;
+	BigInt lastAns(buffer);
+	lastAns.sign = finalSign;
+	return lastAns;
+	
 }
 
 BigInt operator/=(BigInt& a, BigInt b)
