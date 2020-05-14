@@ -370,7 +370,11 @@ void main()
 {
 	BigInt x, y("1234"), z("00000987654321");
 
-
+	BigInt a = 10;
+	
+	a *= 8;
+	
+	cout << a;
 
 	
 	cout << "x y z values: " << x << ' ' << y << ' ' << z << endl;

@@ -125,7 +125,7 @@ BigInt& BigInt::operator--()
 BigInt operator*(BigInt a, BigInt times)
 {
 	BigInt temp(a);
-	if(times._numDigits==1||times._digits[0]==0)
+	if(temp.isZero()==1||times.isZero()==1)
 	{
         return 0;
 	}
@@ -161,68 +161,70 @@ BigInt operator*=(BigInt& a, BigInt times)
 
 BigInt BigInt::operator/(BigInt b)
 {
-	/*瞯ぃ镑
-	 */
 	int finalSign = sign * b.sign;
-	
 	BigInt temp(*this);
 	temp.sign = 1;
 	b.sign = 1;
-	int currentIndex = _numDigits - b._numDigits;
-	int currentUpperCap = _numDigits - 1;
+
+	//main idea:盽埃猭
+	
+	int currentIndex = _numDigits - b._numDigits; //ヘ玡埃猭ヘ夹竚
+	int currentUpperCap = _numDigits - 1; //ヘ玡计程竚
 
 	
-	string answer = "";
+	string answer = ""; //硂﹃氮
 	
-	BigInt currentRemainder;
+	BigInt currentRemainder; //–近緇计
 
 	
 	while (true)
 	{
 		
-		if(currentIndex==-1)
+		if(currentIndex==-1)//狦ヘ夹竚琌0竒场埃Ч
 		{
 			break;
 		}
-		
+
+
+		//т硂近璶砆埃计眖ヘ玡程秨﹍ъъヘ夹竚ゎ
 		string theNum = "";
 		int i;
 		for (i = currentUpperCap; i >= currentIndex; i--)
 		{
 			theNum += to_string(temp._digits[i]);
 		}
-		const char* buffer = theNum.c_str();
-
-	
+		const char* buffer = theNum.c_str(); //﹃锣char夹
 		BigInt theNumThisRound(buffer);
-		//cout <<"temp:"<<temp<< "\ttheNum: " << theNumThisRound << "\t";
 
-		
+
+		//眔硂近坝㎝緇计
 		int resultThisRound = theNumThisRound.division(b, currentRemainder);
 
-		//cout << "result this round:" << resultThisRound  <<"\tcurrentRemainder: "<<currentRemainder << endl;
 
+		//clear Zero
 		while (currentRemainder._digits[currentRemainder._numDigits - 1] == 0)
 		{
 			currentRemainder._numDigits = currentRemainder._numDigits - 1;
 		}
 
-		if (resultThisRound == 0)
+		if (resultThisRound == 0)//狦近坝琌0
 		{
-			answer += to_string(0);
+			answer += to_string(0); //р0秈氮
 			currentIndex--;
 		}
-		else
+		else //狦近坝ぃ琌0
 		{
-			answer += to_string(resultThisRound);
+			answer += to_string(resultThisRound); //р坝秈氮
 			int j = 0;
+
+			//р緇计钡セ计碞秈︽近埃猭
 			while(j<currentRemainder._numDigits)
 			{
 				temp._digits[currentIndex+j]=currentRemainder._digits[j];
 				j++;
 			}
 			temp._numDigits = currentIndex + j;
-			currentUpperCap = temp._numDigits - 1;
+			currentUpperCap = temp._numDigits - 1; //р程砞Θ钡近緇计眔
 			currentIndex --;
 		}
 	}
@@ -230,7 +232,6 @@ BigInt BigInt::operator/(BigInt b)
 	BigInt lastAns(buffer);
 	lastAns.sign = finalSign;
 	return lastAns;
-	
 }
 
 BigInt operator/=(BigInt& a, BigInt b)
