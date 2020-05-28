@@ -236,10 +236,11 @@ void BigInt::Add(const BigInt& bi)
 				adder._digits[i] = 9;
 			}
 		}
-
+		//cout << "adderCopy" << adder << endl;
 		adder.Add(1);
 		isSubtracttion = 1;
 		adder._numDigits = biSize;
+		//cout << "adderCopy" << adder << endl;
 	}
 	else
 	{
@@ -338,7 +339,6 @@ int BigInt::division(BigInt b, BigInt& remainder)
 		temp.Add(b);
 		counter++;
 	}
-
 	b.sign = b.sign * -1;
 	temp.Add(b);
 	remainder = temp;
@@ -364,17 +364,13 @@ int BigInt::isZero()
 int BigInt::bigIntCounter = 0;
 
 
-//TODO:一個好一點的除法演算法
+
 
 void main()
 {
 	BigInt x, y("1234"), z("00000987654321");
 
-	BigInt a = 10;
 	
-	a *= 8;
-	
-	cout << a;
 
 	
 	cout << "x y z values: " << x << ' ' << y << ' ' << z << endl;
